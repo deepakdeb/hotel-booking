@@ -32,7 +32,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <NavLink href={route('admin.hotels.index')} active={route().current('admin.hotels.*')}>
                                             Manage Hotels
                                         </NavLink>
-                                        <NavLink href={route('bookings.index')} active={route().current('bookings.index')}>
+                                        <NavLink href={route('admin.bookings')} active={route().current('admin.bookings')}>
                                             All Bookings
                                         </NavLink>
                                     </>
@@ -122,9 +122,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('admin.hotels.index')} active={route().current('admin.hotels.*')}>
                                     Manage Hotels
                                 </ResponsiveNavLink>
-                                {/* <ResponsiveNavLink href={route('admin.bookings')} active={route().current('admin.bookings')}>
+                                <ResponsiveNavLink href={route('admin.bookings')} active={route().current('admin.bookings')}>
                                     All Bookings
-                                </ResponsiveNavLink> */}
+                                </ResponsiveNavLink>
                             </>
                         )}
                         

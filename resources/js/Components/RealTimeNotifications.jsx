@@ -1,27 +1,58 @@
-import { useState } from 'react';
-import useWebSocket from '@/Hooks/useWebSocket';
+import { useState, useEffect } from 'react';
+import { usePage } from '@inertiajs/react';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
 export default function RealTimeNotifications() {
     const [notifications, setNotifications] = useState([]);
     const { auth } = usePage().props;
 
-    const handleNewBooking = (data) => {
-        setNotifications(prev => [
-            ...prev,
-            {
-                id: Date.now(),
-                type: 'booking',
-                message: `New booking: ${data.booking.reference} for ${data.booking.hotel.name}`,
-                data: data.booking
-            }
-        ]);
-    };
+    useEffect(() => {
+    if (!auth.user) return;
 
-    // Listen for admin notifications
-    useWebSocket('admin.bookings', 'NewBookingCreated', handleNewBooking);
+    console.log('Initializing Echo with config:', {
+        key: import.meta.env.VITE_REVERB_APP_KEY,
+        host: import.meta.env.VITE_REVERB_HOST,
+        port: import.meta.env.VITE_REVERB_PORT
+    });
 
-    // Listen for user-specific notifications
-    useWebSocket(`user.${auth.user?.id}.bookings`, 'NewBookingCreated', handleNewBooking);
+    try {
+        window.Echo = new Echo({
+            broadcaster: 'reverb',
+            key: import.meta.env.VITE_REVERB_APP_KEY,
+            wsHost: import.meta.env.VITE_REVERB_HOST,
+            wsPort: import.meta.env.VITE_REVERB_PORT,
+            wssPort: import.meta.env.VITE_REVERB_PORT,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
+        });
+
+        console.log('Echo initialized successfully');
+
+        // Add connection event listeners for debugging
+        if (
+            window.Echo &&
+            window.Echo.connector &&
+            window.Echo.connector.socket &&
+            window.Echo.connector.socket.on
+        ) {
+            window.Echo.connector.socket.on('connect', () => {
+                console.log('WebSocket connected successfully');
+            });
+
+            window.Echo.connector.socket.on('error', (error) => {
+                console.error('WebSocket connection error:', error);
+            });
+        } else {
+            console.warn('Echo socket or connection is not available for event binding.');
+        }
+
+    } catch (error) {
+        console.error('Failed to initialize Echo:', error);
+    }
+
+    // ... rest of the useEffect
+}, [auth.user]);
 
     const removeNotification = (id) => {
         setNotifications(prev => prev.filter(notif => notif.id !== id));
@@ -34,7 +65,7 @@ export default function RealTimeNotifications() {
             {notifications.map(notification => (
                 <div
                     key={notification.id}
-                    className="bg-white border-l-4 border-green-500 shadow-md rounded-lg p-4 w-80 animate-fade-in"
+                    className="bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 w-80"
                 >
                     <div className="flex justify-between items-start">
                         <div className="flex-1">
@@ -42,12 +73,12 @@ export default function RealTimeNotifications() {
                                 {notification.message}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
-                                {new Date(notification.data.created_at).toLocaleString()}
+                                {notification.timestamp.toLocaleTimeString()}
                             </p>
                         </div>
                         <button
                             onClick={() => removeNotification(notification.id)}
-                            className="ml-4 text-gray-400 hover:text-gray-600"
+                            className="ml-4 text-gray-400 hover:text-gray-600 text-lg"
                         >
                             ×
                         </button>

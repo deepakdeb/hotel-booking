@@ -142,4 +142,17 @@ class BookingController extends Controller
         }
     }
 
+    public function adminIndex()
+    {
+        Gate::authorize('viewAny', Booking::class);
+        
+        $bookings = Booking::with(['hotel', 'room', 'user'])
+            ->latest()
+            ->get();
+        
+        return Inertia::render('Admin/Bookings/Index', [
+            'bookings' => $bookings,
+        ]);
+    }
+
 }

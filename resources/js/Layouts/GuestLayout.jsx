@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 
 export default function GuestLayout({ children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
@@ -16,14 +15,23 @@ export default function GuestLayout({ children }) {
                                 <Link href="/">
                                     <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
                                 </Link>
-                                <ResponsiveNavLink href={route('search')} active={route().current('search')}>
-                                    Search Hotels
-                                </ResponsiveNavLink>
                             </div>
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ms-6">
                             <div className="ms-3 space-x-4">
+                                <Link
+                                    href={route('search')}
+                                    className="text-gray-600 hover:text-gray-900"
+                                >
+                                    Search Hotels
+                                </Link>
+                                <Link
+                                    href={route('bookings.guest-access')}
+                                    className="text-gray-600 hover:text-gray-900"
+                                >
+                                    Access Booking
+                                </Link>
                                 <Link
                                     href={route('login')}
                                     className="text-gray-600 hover:text-gray-900"
@@ -67,6 +75,18 @@ export default function GuestLayout({ children }) {
 
                 <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                     <div className="pt-2 pb-3 space-y-1">
+                        <Link
+                            href={route('search')}
+                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300"
+                        >
+                            Search Hotels
+                        </Link>
+                        <Link
+                            href={route('bookings.guest-access')}
+                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300"
+                        >
+                            Access Booking
+                        </Link>
                         <Link
                             href={route('login')}
                             className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300"
