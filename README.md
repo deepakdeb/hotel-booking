@@ -1,61 +1,282 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Hotel Booking Platform
+======================
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A full-stack hotel booking platform built with Laravel, React.js, Inertia.js, and Tailwind CSS. Features real-time booking notifications, multi-currency support, and guest booking capabilities.
 
-## About Laravel
+🚀 Features
+-----------
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### ✅ Mandatory Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*   **User Roles & Authentication** (Admin, User, Guest)
+    
+*   **Hotel Search with Elasticsearch** (Filter by location, dates, amenities)
+    
+*   **Guest Booking System** (Book without account, email confirmation)
+    
+*   **Admin Dashboard** (CRUD operations for hotels and bookings)
+    
+*   **Responsive Design** (Tailwind CSS for mobile/desktop)
+    
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### ✅ Optional Features
 
-## Learning Laravel
+*   **Multi-Currency Support** (USD, EUR, GBP with real-time conversion)
+    
+*   **Advanced Search Filters** (Price range, amenities, dates)
+    
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+🛠️ Tech Stack
+--------------
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+*   **Backend**: Laravel 12, Laravel Reverb, Laravel Scout
+    
+*   **Frontend**: React.js, Inertia.js, Tailwind CSS
+    
+*   **Search**: Elasticsearch with Laravel Scout
+    
+*   **Real-time**: Laravel Reverb (WebSockets)
+    
+*   **Database**: MySQL
+    
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+📦 Installation
+---------------
 
-## Laravel Sponsors
+### Prerequisites
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+*   PHP 8.2+
+    
+*   Composer
+    
+*   Node.js 16+
+    
+*   MySQL 8.0+
+    
+*   Elasticsearch 8.x
+    
 
-### Premium Partners
+### 1\. Clone the Repository
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+git clone https://github.com/deepakdeb/hotel-booking.git
+cd hotel-booking
+```
 
-## Contributing
+### 2\. Install Dependencies
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+# PHP dependencies
+composer install
 
-## Code of Conduct
+# JavaScript dependencies
+npm install
+```
+### 3\. Environment Setup
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+Update `.env` with your database credentials:
 
-## Security Vulnerabilities
+```bash
+DB_DATABASE=hotel_booking
+DB_USERNAME=root
+DB_PASSWORD=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Reverb Configuration
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=hotel-booking-platform
+REVERB_APP_KEY=base64:your-generated-key
+REVERB_APP_SECRET=your-generated-secret
+REVERB_HOST=127.0.0.1
+REVERB_PORT=8080
 
-## License
+# Elasticsearch
+SCOUT_DRIVER=elasticsearch
+ELASTICSEARCH_HOST=http://localhost:9200
+ELASTICSEARCH_INDEX=hotel_booking
+```
+### 4\. Database Setup
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+# Run migrations and seeders
+php artisan migrate --seed
+
+# Generate Reverb keys
+php artisan reverb:key:generate
+```
+### 5\. Elasticsearch Setup
+
+```bash
+# Using Docker
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:8.11.0
+
+# Import data into Elasticsearch
+php artisan scout:import "App\\Models\\Hotel"
+```
+🚀 Running the Application
+--------------------------
+
+### Start Development Servers
+
+Open **multiple terminal tabs**:
+
+**Terminal 1 - Laravel Application**
+
+```bash
+php artisan serve
+```
+**Terminal 2 - Reverb Server**
+
+```bash
+php artisan reverb:start
+```
+**Terminal 3 - Frontend Build**
+
+```bash
+npm run dev
+```
+**Terminal 4 - Elasticsearch** (if not using Docker)
+
+```bash
+# Start Elasticsearch service
+elasticsearch
+```
+### Access the Application
+
+*   **Main Application**: [http://localhost:8000](http://localhost:8000)
+    
+*   **Reverb Dashboard**: [http://localhost:8080](http://localhost:8080)
+    
+*   **Elasticsearch**: [http://localhost:9200](http://localhost:9200)
+    
+
+👤 Default Accounts
+-------------------
+
+### Admin Account
+
+*   **Email**: [admin@hotelbooking.com](https://mailto:admin@hotelbooking.com)
+    
+*   **Password**: password
+    
+*   **Access**: Full admin privileges, hotel management
+    
+
+### User Account
+
+*   **Email**: [user@hotelbooking.com](https://mailto:user@hotelbooking.com)
+    
+*   **Password**: password
+    
+*   **Access**: Book hotels, view personal bookings
+    
+
+### Guest Access
+
+*   No account needed for bookings
+    
+*   Access bookings via email and reference number
+    
+
+🎯 Usage Guide
+--------------
+
+### For Guests
+
+1.  Search hotels using filters
+    
+2.  Select room and dates
+    
+3.  Book without creating account
+    
+4.  Receive confirmation email with reference
+    
+5.  Access booking later via guest portal
+    
+
+### For Registered Users
+
+1.  Create account or login
+    
+2.  Search and book hotels
+    
+3.  View booking history
+    
+4.  Manage existing bookings
+    
+
+### For Administrators
+
+1.  Login with admin credentials
+    
+2.  Manage hotels (CRUD operations)
+
+3. Manage rooms from hotels(CRUD)
+    
+4.  View all bookings
+    
+5.  Monitor real-time booking notifications
+    
+
+🔧 Troubleshooting
+------------------
+
+### Common Issues
+
+**WebSocket Connection Failed**
+
+```bash
+
+# Ensure Reverb server is running
+php artisan reverb:start
+
+# Check port 8080 is available
+lsof -i :8080
+```
+**Elasticsearch Connection Error**
+
+```bash
+# Start Elasticsearch
+docker start elasticsearch
+
+# Or install locally
+brew install elasticsearch
+```
+**Environment Variables**
+
+```bash
+# Clear cache
+php artisan optimize:clear
+
+# Regenerate keys
+php artisan reverb:key:generate
+```
+📁 Project Structure
+--------------------
+
+```bash
+hotel-booking-platform/
+├── app/
+│   ├── Models/          # Eloquent models
+│   ├── Http/
+│   │   ├── Controllers/ # Application controllers
+│   │   └── Middleware/  # Custom middleware
+│   ├── Policies/        # Authorization policies
+│   └── Events/          # Real-time events
+├── resources/
+│   └── js/
+│       ├── Components/  # React components
+│       ├── Layouts/     # Layout components
+│       └── Pages/       # Inertia pages
+├── config/              # Configuration files
+└── database/
+    ├── migrations/      # Database migrations
+    └── seeders/         # Test data seeders
+```
+
+* * *
+
+**Happy Booking!** 🏨✈️
