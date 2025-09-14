@@ -14,14 +14,19 @@ class SearchController extends Controller
     {
         $query = Hotel::query()->with('rooms');
         
-        // Search by location
-        if ($request->has('location') && $request->location) {
-            $query->where('city', 'like', '%' . $request->location . '%')
-                  ->orWhere('country', 'like', '%' . $request->location . '%');
+        // Search by string using Scout if query is provided
+        if ($request->has('search_text') && !empty($request->search_text)) {
+            $query->where(function($q) use ($request) {
+                $q->where('city', 'like', '%' . $request->search_text . '%')
+                ->orWhere('country', 'like', '%' . $request->search_text . '%')
+                ->orWhere('name', 'like', '%' . $request->search_text . '%')
+                ->orWhere('description', 'like', '%' . $request->search_text . '%');
+            });
         }
         
         // Filter by dates and availability
-        if ($request->has('check_in') && $request->has('check_out')) {
+        if ($request->has('check_in') && $request->has('check_out') && 
+            !empty($request->check_in) && !empty($request->check_out)) {
             $checkIn = Carbon::parse($request->check_in);
             $checkOut = Carbon::parse($request->check_out);
             
@@ -30,37 +35,39 @@ class SearchController extends Controller
                 $q->whereDoesntHave('bookings', function($bookingQuery) use ($checkIn, $checkOut) {
                     $bookingQuery->where(function($q) use ($checkIn, $checkOut) {
                         $q->whereBetween('check_in', [$checkIn, $checkOut])
-                          ->orWhereBetween('check_out', [$checkIn, $checkOut])
-                          ->orWhere(function($q) use ($checkIn, $checkOut) {
-                              $q->where('check_in', '<=', $checkIn)
+                        ->orWhereBetween('check_out', [$checkIn, $checkOut])
+                        ->orWhere(function($q) use ($checkIn, $checkOut) {
+                            $q->where('check_in', '<=', $checkIn)
                                 ->where('check_out', '>=', $checkOut);
-                          });
+                        });
                     })->where('status', 'confirmed');
                 });
             });
         }
         
         // Filter by guests
-        if ($request->has('guests')) {
+        if ($request->has('guests') && !empty($request->guests)) {
             $query->whereHas('rooms', function($q) use ($request) {
-                $q->where('capacity', '>=', $request->guests);
+                $q->where('capacity', '>=', (int)$request->guests);
             });
         }
         
-        // Filter by price range
-        if ($request->has('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+        // Filter by price range - only if values are provided and numeric
+        if ($request->has('min_price') && is_numeric($request->min_price) && $request->min_price > 0) {
+            $query->where('price', '>=', (float)$request->min_price);
         }
         
-        if ($request->has('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+        if ($request->has('max_price') && is_numeric($request->max_price) && $request->max_price > 0) {
+            $query->where('price', '<=', (float)$request->max_price);
         }
         
-        // Filter by amenities
-        if ($request->has('amenities')) {
+        // Filter by amenities - only if amenities are provided
+        if ($request->has('amenities') && !empty($request->amenities)) {
             $amenities = is_array($request->amenities) ? $request->amenities : [$request->amenities];
             foreach ($amenities as $amenity) {
-                $query->whereJsonContains('amenities', $amenity);
+                if (!empty($amenity)) {
+                    $query->whereJsonContains('amenities', $amenity);
+                }
             }
         }
         
@@ -71,7 +78,8 @@ class SearchController extends Controller
             $hotel->available_rooms = 0;
             $hotel->min_price = $hotel->rooms->min('price') ?? $hotel->price;
             
-            if ($request->has('check_in') && $request->has('check_out')) {
+            if ($request->has('check_in') && $request->has('check_out') && 
+                !empty($request->check_in) && !empty($request->check_out)) {
                 $checkIn = Carbon::parse($request->check_in);
                 $checkOut = Carbon::parse($request->check_out);
                 
@@ -107,6 +115,28 @@ class SearchController extends Controller
             ->count();
         
         return max(0, $room->quantity - $bookedRooms);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('query');
+        
+        if (empty($query)) {
+            return response()->json([]);
+        }
+        
+        // Use Elasticsearch for search
+        $results = Hotel::search($query)->take(10)->get();
+        
+        return response()->json($results->map(function ($hotel) {
+            return [
+                'id' => $hotel->id,
+                'name' => $hotel->name,
+                'city' => $hotel->city,
+                'country' => $hotel->country,
+                'price' => $hotel->price
+            ];
+        }));
     }
     
     public function autocomplete(Request $request)

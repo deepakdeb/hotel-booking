@@ -10,7 +10,7 @@ export default function Search({ hotels, filters: initialFilters }) {
     const Layout = auth.user ? AuthenticatedLayout : GuestLayout;
     
     const { data, setData, get } = useForm({
-        location: initialFilters.location || '',
+        search_text: initialFilters.search_text || '',
         check_in: initialFilters.check_in || '',
         check_out: initialFilters.check_out || '',
         guests: initialFilters.guests || 1,
@@ -45,15 +45,15 @@ export default function Search({ hotels, filters: initialFilters }) {
                             <form onSubmit={handleSearch} className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <div>
-                                        <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-                                            Destination
+                                        <label htmlFor="search_text" className="block text-sm font-medium text-gray-700">
+                                            Search
                                         </label>
                                         <input
                                             type="text"
-                                            id="location"
-                                            value={data.location}
-                                            onChange={(e) => setData('location', e.target.value)}
-                                            placeholder="City or Country"
+                                            id="search_text"
+                                            value={data.search_text}
+                                            onChange={(e) => setData('search_text', e.target.value)}
+                                            placeholder="Name, Description, City or Country"
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
                                     </div>

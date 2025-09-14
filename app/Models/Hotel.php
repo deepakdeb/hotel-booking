@@ -33,12 +33,25 @@ class Hotel extends Model
     public function toSearchableArray()
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
             'city' => $this->city,
             'country' => $this->country,
             'address' => $this->address,
+            'price' => $this->price,
+            'amenities' => $this->amenities,
+            'created_at' => $this->created_at->timestamp,
+            'updated_at' => $this->updated_at->timestamp,
         ];
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable()
+    {
+        return true;
     }
 
     public function getMinPriceAttribute()
